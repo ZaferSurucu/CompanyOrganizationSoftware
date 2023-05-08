@@ -36,7 +36,7 @@ files:
 #   "permissions" section altogether. A blank or incomplete "permissions"
 #   section may cause associated deployments to fail.
 permissions:
-  - object: /
+  - object: /home/ec2-user/server
     pattern: "**"
     except:
     owner: ec2-user
