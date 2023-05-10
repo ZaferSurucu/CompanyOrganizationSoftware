@@ -2,8 +2,8 @@ version: 0.0
 os: linux
 
 files:
-  - source: /
-    destination: /home/ec2-user/server
+  - source: ./my-app-1.0-SNAPSHOT.jar
+    destination: /tmp
 
 permissions:
   - object: /
