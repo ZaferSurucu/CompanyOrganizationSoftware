@@ -12,7 +12,7 @@ phases:
       - echo Build completed on `date`
 artifacts:
   files:
-    - target/my-app-1.0-SNAPSHOT.jar
+    - target/CompanyOrganizationSoftware-1.0-SNAPSHOT.jar
     - scripts/*
     - appspec.yml
     - buildspec.yml
