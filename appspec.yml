@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: /target/CompanyOrganizationSoftware.jar
-    destination: /tmp
+    destination: /home/ec2-user/CompanyOrganizationSoftware.jar
 
 permissions:
   - object: /
