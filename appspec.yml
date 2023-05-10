@@ -2,8 +2,8 @@ version: 0.0
 os: linux
 
 files:
-  - source: /target/CompanyOrganizationSoftware.jar
-    destination: /home/ec2-user/CompanyOrganizationSoftware.jar
+  - source: ./CompanyOrganizationSoftware.0.0.1-SNAPSHOT.jar
+    destination: /tmp
 
 permissions:
   - object: /
