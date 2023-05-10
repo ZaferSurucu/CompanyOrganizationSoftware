@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  - source: CompanyOrganizationSoftware-1.0-SNAPSHOT.jar
+  - source: ./CompanyOrganizationSoftware-1.0-SNAPSHOT.jar
     destination: /tmp
 
 permissions:
