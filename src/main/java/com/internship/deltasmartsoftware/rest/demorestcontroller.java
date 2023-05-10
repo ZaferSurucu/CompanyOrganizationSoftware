@@ -8,6 +8,6 @@ public class demorestcontroller {
 
     @GetMapping("/")
     public String sayHello() {
-        return "Hello World! Time on server is ";
+        return "Hello World! Time on server is " + java.time.LocalDateTime.now();
     }
 }
