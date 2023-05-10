@@ -12,5 +12,5 @@ phases:
       - echo Build completed on `date`
 artifacts:
   files:
-    - target/CompanyOrganizationSoftware.jar
+    - target/CompanyOrganizationSoftware-1.0-SNAPSHOT.jar
   discard-paths: yes
