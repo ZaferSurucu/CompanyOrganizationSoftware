@@ -1,6 +1,11 @@
 version: 0.2
 
 phases:
+  pre_build:
+    commands:
+      - echo Nothing to do in the pre_build phase...
+      - yum install java-17-amazon-corretto-devel -y
+      - alternatives --set java /usr/lib/jvm/java-17-amazon-corretto.aarch64/bin/java
   build:
     commands:
       - echo Entered the build phase...
@@ -8,7 +13,7 @@ phases:
   post_build:
     commands:
       - echo Build completed successfully
+      - mv target/deltasmartsoftware-0.0.1-SNAPSHOT.jar deltasmartsoftware.jar
 artifacts:
   files:
-    - target/deltasmartsoftware-0.0.1-SNAPSHOT.jar
-  discard-paths: yes
+    - deltasmartsoftware.jar
