@@ -1,19 +1,28 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo Entered the install phase...
+      - echo Installing Maven...
+      - yum install maven -y
+      - echo Maven installed successfully
   pre_build:
     commands:
+      - echo Entered the pre_build phase...
       - echo Nothing to do in the pre_build phase...
-      - yum install java-17-amazon-corretto-devel -y
-      - alternatives --set java /usr/lib/jvm/java-17-amazon-corretto.aarch64/bin/java
   build:
     commands:
       - echo Entered the build phase...
-      - mvn clean package
+      - echo Building the project...
+      - mvn install
+      - echo Build completed on `date`
   post_build:
-    commands:
-      - echo Build completed successfully
-      - mv target/deltasmartsoftware-0.0.1-SNAPSHOT.jar deltasmartsoftware.jar
+        commands:
+            - echo Entered the post_build phase...
+            - echo Nothing to do in the post_build phase...
 artifacts:
-  files:
-    - deltasmartsoftware.jar
+    files:
+        - target/*.jar
