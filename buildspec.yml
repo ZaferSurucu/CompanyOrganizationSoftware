@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
       runtime-versions:
-      java: corretto17
+        java: corretto17
       commands:
       - echo Installing Maven 3.8.2
       - wget https://downloads.apache.org/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz
