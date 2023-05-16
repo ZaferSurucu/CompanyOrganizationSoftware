@@ -5,6 +5,7 @@ phases:
     commands:
       - yum install java-17-amazon-corretto-devel -y
       - alternatives --set java /usr/lib/jvm/java-17-amazon-corretto/bin/java
+      - export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 
   build:
     commands:
