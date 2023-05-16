@@ -4,6 +4,8 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
+      - yum install java-17-amazon-corretto-devel -y
+      - alternatives --set java /usr/lib/jvm/java-17-amazon-corretto/bin/java
   build:
     commands:
       - echo Entered the build phase...
