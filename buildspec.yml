@@ -1,10 +1,6 @@
 version: 0.2
 
-phases:
-  install:
-    runtime-versions:
-      java: corretto17  # Specify Corretto 17 as the Java runtime version
-
+phases:  # Specify Corretto 17 as the Java runtime version
   pre_build:
     commands:
       - echo "Installing custom Java runtime"
