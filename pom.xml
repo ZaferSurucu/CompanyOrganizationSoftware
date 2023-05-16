@@ -14,7 +14,7 @@
 	<name>deltasmartsoftware</name>
 	<description>Internship project for Delta Smart</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>11</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
