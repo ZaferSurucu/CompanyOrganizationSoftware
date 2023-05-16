@@ -1,17 +1,25 @@
 version: 0.2
 
 phases:
+  install:
+      runtime-versions:
+      java: corretto17
+      commands:
+      - echo Installing Maven 3.8.2
+      - wget https://downloads.apache.org/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz
+      - tar -xzf apache-maven-3.8.2-bin.tar.gz
+      - export PATH=$PATH:$PWD/apache-maven-3.8.2/bin
+      - mvn -version
   pre_build:
     commands:
       - yum install java-17-amazon-corretto-devel -y
       - alternatives --set java /usr/lib/jvm/java-17-amazon-corretto/bin/java
-      - export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 
   build:
     commands:
       - java -version  # Verify that Corretto 17 is being used
       - echo Build started on `date`
-      - mvn install    # Run the build
+      - mvn clean install    # Run the build
 
   post_build:
     commands:
