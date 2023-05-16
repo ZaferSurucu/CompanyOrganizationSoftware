@@ -1,16 +1,31 @@
-version: 0.2
+version: 0.3
 
 phases:
-  pre_build:
-    commands:
-      - curl -L -O https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz
-      - tar xzf openjdk-17_linux-x64_bin.tar.gz
-      - export JAVA_HOME=$PWD/jdk-17
-      - export PATH=$JAVA_HOME/bin:$PATH
+  install:
+    runtime-versions:
+      java: corretto17  # Specify Corretto 17 as the Java runtime version
+
   build:
     commands:
-      - mvn install -DskipTests=true
-      - mvn test
-artifacts:
-    files:
-        - target/*.jar
+      - java -version  # Verify that Corretto 17 is being used
+      - echo Build started on `date`
+      - mvn install    # Run the build
+      - echo Build completed on `date`
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo This is a sample buildspec for Java using Corretto 17
+      - echo The build was run on a compute environment managed by AWS CodeBuild
+      - echo The build version is $CODEBUILD_BUILD_ID
+      - echo The project name is $CODEBUILD_PROJECT_NAME
+      - echo The build number is $CODEBUILD_BUILD_NUMBER
+      - echo The source version is $CODEBUILD_SOURCE_VERSION
+      - echo The branch name is $CODEBUILD_SOURCE_VERSION
+      - echo The repository name is $CODEBUILD_SOURCE_REPO_URL
+      - echo The repository type is $CODEBUILD_SOURCE_REPO_URL
+      - echo The source provider is $CODEBUILD_SOURCE_PROVIDER
+artifact:
+  files:
+    - target/*.jar
+  discard-paths: yes
