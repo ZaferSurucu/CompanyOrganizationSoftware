@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name="user")
 @Data
+@Table(name="user")
 public class User {
 
     @Id
@@ -36,4 +36,17 @@ public class User {
 
     private String deletedAt;
 
+    public User(){
+        this.id = 0;
+        this.name = "name";
+        this.surname = "surname";
+        this.email = "email";
+        this.password = "password";
+        this.enabled = true;
+        this.active = true;
+    }
+
+    public boolean getEnabled() {
+        return this.enabled;
+    }
 }
