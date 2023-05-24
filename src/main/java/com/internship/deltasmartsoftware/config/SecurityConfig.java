@@ -1,9 +1,9 @@
 package com.internship.deltasmartsoftware.config;
 
 
-import com.internship.deltasmartsoftware.security.AuthenticationFilter;
+import com.internship.deltasmartsoftware.security.JwtAuthenticationFilter;
 import com.internship.deltasmartsoftware.security.RestAuthenticationEntryPoint;
-import com.internship.deltasmartsoftware.service.CustomUserDetailsService;
+import com.internship.deltasmartsoftware.service.authService.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,13 +16,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private CustomUserDetailsService customUserDetailsService;
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
         this.customUserDetailsService = customUserDetailsService;
@@ -35,8 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationFilter authenticationFilter() throws Exception {
-        return new AuthenticationFilter();
+    public JwtAuthenticationFilter authenticationFilter() throws Exception {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
@@ -44,6 +47,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
     }
@@ -51,6 +55,18 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(java.util.List.of("*"));
+        config.setAllowCredentials(true);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
     @Bean

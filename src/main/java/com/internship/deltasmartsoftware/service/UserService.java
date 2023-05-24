@@ -11,13 +11,13 @@ import java.util.Calendar;
 @Service
 public class UserService {
 
-    private VerificationTokenRepository tokenRepository;
+    private VerificationTokenRepository verificationTokenRepository;
 
 
     UserRepository userRepository;
 
     public UserService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
-        this.tokenRepository = tokenRepository;
+        this.verificationTokenRepository = tokenRepository;
         this.userRepository = userRepository;
     }
 
@@ -31,18 +31,18 @@ public class UserService {
 
     public void saveUserVerificationToken(User theUser, String token) {
         VerificationToken verificationToken = new VerificationToken(token, theUser);
-        tokenRepository.save(verificationToken);
+        verificationTokenRepository.save(verificationToken);
     }
 
     public String validateToken(String theToken) {
-        VerificationToken token = tokenRepository.findByToken(theToken);
+        VerificationToken token = verificationTokenRepository.findByToken(theToken);
         if(token == null){
             return "Invalid verification token";
         }
         User user = token.getUser();
         Calendar calendar = Calendar.getInstance();
         if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
-            tokenRepository.delete(token);
+            verificationTokenRepository.delete(token);
             return "Token already expired";
         }
         user.setEnabled(true);

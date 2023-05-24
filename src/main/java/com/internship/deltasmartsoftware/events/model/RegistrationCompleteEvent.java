@@ -1,4 +1,4 @@
-package com.internship.deltasmartsoftware.security;
+package com.internship.deltasmartsoftware.events.model;
 
 import com.internship.deltasmartsoftware.model.User;
 import lombok.Getter;

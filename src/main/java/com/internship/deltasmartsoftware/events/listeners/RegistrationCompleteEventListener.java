@@ -1,13 +1,12 @@
-package com.internship.deltasmartsoftware.security;
+package com.internship.deltasmartsoftware.events.listeners;
 
+import com.internship.deltasmartsoftware.events.model.RegistrationCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -19,6 +18,8 @@ import java.util.UUID;
 @Component
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
     private UserService userService;
+
+    private final String frontUrl = "https://company-organization-software.vercel.app/";
 
     private JavaMailSender mailSender;
 
@@ -33,7 +34,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         theUser = event.getUser();
         String verificationToken = UUID.randomUUID().toString();
         userService.saveUserVerificationToken(theUser, verificationToken);
-        String url = event.getApplicationUrl()+"/verifyEmail?token="+verificationToken;
+        String url = frontUrl+"/setNewPassword?token="+verificationToken;
         try {
             sendVerificationEmail(url);
         } catch (MessagingException | UnsupportedEncodingException e) {
@@ -41,11 +42,11 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         }
         log.info("Click the link to verify your registration :  {}", url);
     }
-    public void sendVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
+    private void sendVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Email Verification";
         String senderName = "User Registration Portal Service";
         String mailContent = "<p> Hi, "+ theUser.getName()+ ", </p>"+
-                "<p>Thank you for registering with us,"+"" +
+                "<p>Thank you for registering with us,"+
                 "Please, follow the link below to complete your registration.</p>"+
                 "<a href=\"" +url+ "\">Verify your email to activate your account</a>"+
                 "<p> Thank you <br> Users Registration Portal Service";

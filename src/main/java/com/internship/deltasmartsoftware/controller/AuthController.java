@@ -1,84 +1,71 @@
 package com.internship.deltasmartsoftware.controller;
 
-import com.internship.deltasmartsoftware.model.Role;
-import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.requests.UserRequest;
 import com.internship.deltasmartsoftware.responses.AuthResponse;
-import com.internship.deltasmartsoftware.security.RegistrationCompleteEvent;
-import com.internship.deltasmartsoftware.security.TokenProvider;
-import com.internship.deltasmartsoftware.model.VerificationToken;
-import com.internship.deltasmartsoftware.repository.VerificationTokenRepository;
-import com.internship.deltasmartsoftware.service.RoleService;
-import com.internship.deltasmartsoftware.service.UserService;
+import com.internship.deltasmartsoftware.service.authService.LoginService;
+import com.internship.deltasmartsoftware.service.authService.SendEmailService;
+import com.internship.deltasmartsoftware.service.authService.SetNewPasswordService;
+import com.internship.deltasmartsoftware.service.authService.VerifyTokenService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/auth")
 public class AuthController {
-    Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private UserService userService;
 
-    private RoleService roleService;
+    //The admin sets Tolgahan's role, department, company, name, surname, email.
+    //'Password' by default is null and 'Enabled' by default is 0.
+    //An email with a link(15 minute expiration duration
 
-    private AuthenticationManager authenticationManager;
+    private SendEmailService sendEmailService;
+    private VerifyTokenService verifyTokenService;
+    private LoginService loginService;
+    private SetNewPasswordService setNewPasswordService;
 
-    private TokenProvider tokenProvider;
-
-    private PasswordEncoder passwordEncoder;
-    private ApplicationEventPublisher publisher;
-    private VerificationTokenRepository tokenRepository;
-
-
-    public AuthController(UserService userService, RoleService roleService
-            , AuthenticationManager authenticationManager, TokenProvider tokenProvider
-            , PasswordEncoder passwordEncoder, ApplicationEventPublisher publisher
-            , VerificationTokenRepository tokenRepository) {
-        this.userService = userService;
-        this.roleService = roleService;
-        this.authenticationManager = authenticationManager;
-        this.tokenProvider = tokenProvider;
-        this.passwordEncoder = passwordEncoder;
-        this.publisher = publisher;
-        this.tokenRepository = tokenRepository;
-    }
-
-    @GetMapping("/test")
-    public String getTest() {
-        return "get test";
-    }
-
-    @PostMapping("/test")
-    public String postTest() {
-        return "post test";
+    public AuthController(SendEmailService sendEmailService
+            , VerifyTokenService verifyTokenService
+            , LoginService loginService
+            , SetNewPasswordService setNewPasswordService) {
+        this.sendEmailService = sendEmailService;
+        this.verifyTokenService = verifyTokenService;
+        this.loginService = loginService;
+        this.setNewPasswordService = setNewPasswordService;
     }
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest loginRequest) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-        Authentication auth = authenticationManager.authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        String jwtToken = tokenProvider.generateToken(auth);
-        User user = userService.getOneUserByEmail(loginRequest.getEmail());
-        logger.info("user has this role: " + user.getRole().getName());
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setMessage("User logged in"
-                + loginRequest.getEmail()
-                + " " + loginRequest.getPassword());
-        authResponse.setAccessToken("Bearer " + jwtToken);
-        authResponse.setUserId(user.getId());
-        return authResponse;
+        return loginService.login(loginRequest);
     }
 
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<AuthResponse> forgotPassword(@RequestBody UserRequest userRequest, HttpServletRequest request) {
+        return sendEmailService.forgotPassword(userRequest,request);
+    }
+
+    @PostMapping("/activateAccount")
+    public ResponseEntity<AuthResponse> activateAccount(@RequestBody UserRequest userRequest, HttpServletRequest request) {
+        return sendEmailService.activateAccount(userRequest,request);
+    }
+
+    @PostMapping("/setNewPassword")
+    public ResponseEntity<AuthResponse> resetPassword(@RequestBody UserRequest userRequest) {
+        return setNewPasswordService.setNewPassword(userRequest);
+    }
+
+    @PostMapping("/verifyResetPasswordToken")
+    public ResponseEntity<AuthResponse> verifyResetPasswordToken(@RequestParam("token") String token) {
+        return verifyTokenService.verifyResetPasswordEmailToken(token);
+    }
+
+
+    @PostMapping("/verifyActivationEmailToken")
+    public ResponseEntity<AuthResponse> verifyEmail(@RequestParam("token") String token) {
+        return verifyTokenService.verifyActivationEmailToken(token);
+    }
+
+    /*
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserRequest userRequest) {
         AuthResponse authResponse = new AuthResponse();
@@ -109,42 +96,5 @@ public class AuthController {
         authResponse.setUserId(user.getId());
         return ResponseEntity.ok(authResponse);
 
-    }
-
-    @PostMapping("/activateAccount")
-    public ResponseEntity<AuthResponse> activateAccount(@RequestBody UserRequest userRequest, HttpServletRequest request) {
-        AuthResponse authResponse = new AuthResponse();
-        if(userService.getOneUserByEmail(userRequest.getEmail()) != null) {
-            if(userService.getOneUserByEmail(userRequest.getEmail()).getEnabled()) {
-                authResponse.setMessage("User already activated");
-                return ResponseEntity.badRequest().body(authResponse);
-            } else {
-                User user = userService.getOneUserByEmail(userRequest.getEmail());
-                publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
-                authResponse.setMessage("Activation email sent");
-                return ResponseEntity.ok(authResponse);
-            }
-        }
-        else {
-            authResponse.setMessage("User does not exist");
-            return ResponseEntity.badRequest().body(authResponse);
-        }
-    }
-
-    public String applicationUrl(HttpServletRequest request) {
-        return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
-    }
-
-    @GetMapping("/verify")
-    public String verifyEmail(@RequestParam("token") String token){
-        VerificationToken theToken = tokenRepository.findByToken(token);
-        if (theToken.getUser().getEnabled()){
-            return "This account has already been verified, please, login.";
-        }
-        String verificationResult = userService.validateToken(token);
-        if (verificationResult.equalsIgnoreCase("valid")){
-            return "Email verified successfully. Now you can login to your account";
-        }
-        return "Invalid verification token";
-    }
+    }*/
 }

@@ -7,6 +7,7 @@ public class AuthResponse {
 
     String message;
     int userId;
+    String email;
     String accessToken;
     String refreshToken;
 }

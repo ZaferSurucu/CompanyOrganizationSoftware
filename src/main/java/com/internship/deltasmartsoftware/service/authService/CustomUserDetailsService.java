@@ -1,4 +1,4 @@
-package com.internship.deltasmartsoftware.service;
+package com.internship.deltasmartsoftware.service.authService;
 
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.UserRepository;
