@@ -1,8 +1,10 @@
 package com.internship.deltasmartsoftware.security;
 
+import com.internship.deltasmartsoftware.model.User;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,18 +22,18 @@ public class TokenProvider {
     private long EXPIRES_IN;
 
     public String generateToken(Authentication authentication){
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User userDetails = (User) authentication.getPrincipal();
         Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
         return Jwts.builder()
-                .setSubject((userDetails.getEmail()))
+                .setSubject(userDetails.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, APP_SECRET)
                 .compact();
     }
-
     String getUserEmailFromTokenProvider(String token){
-        return Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(token).getBody().getSubject();
+        Claims claims =  Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(token).getBody();
+        return claims.getSubject();
     }
 
     boolean validateToken(String authToken){

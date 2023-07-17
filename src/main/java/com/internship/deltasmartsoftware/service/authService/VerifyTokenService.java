@@ -4,24 +4,24 @@ import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.model.VerificationToken;
 import com.internship.deltasmartsoftware.repository.VerificationTokenRepository;
 import com.internship.deltasmartsoftware.responses.AuthResponse;
-import com.internship.deltasmartsoftware.service.UserService;
+import com.internship.deltasmartsoftware.service.AuthUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 public class VerifyTokenService {
 
     private VerificationTokenRepository tokenRepository;
-    private UserService userService;
+    private AuthUserService userService;
 
-    public VerifyTokenService(VerificationTokenRepository tokenRepository, UserService userService) {
+    public VerifyTokenService(VerificationTokenRepository tokenRepository, AuthUserService userService) {
         this.tokenRepository = tokenRepository;
         this.userService = userService;
     }
 
-    public ResponseEntity<AuthResponse> verifyResetPasswordEmailToken(@RequestParam("token") String token){
+    public ResponseEntity<AuthResponse> verifyResetPasswordEmailToken(String token){
         AuthResponse authResponse = new AuthResponse();
         VerificationToken theToken = tokenRepository.findByToken(token);
         String verificationResult = userService.validateToken(token);
@@ -34,7 +34,7 @@ public class VerifyTokenService {
         return ResponseEntity.badRequest().body(authResponse);
     }
 
-    public ResponseEntity<AuthResponse> verifyActivationEmailToken(@RequestParam("token") String token){
+    public ResponseEntity<AuthResponse> verifyActivationEmailToken(String token){
         AuthResponse authResponse = new AuthResponse();
         VerificationToken theToken = tokenRepository.findByToken(token);
         if (theToken.getUser().getEnabled()){

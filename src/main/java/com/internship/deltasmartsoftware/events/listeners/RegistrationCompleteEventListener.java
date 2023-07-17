@@ -2,7 +2,7 @@ package com.internship.deltasmartsoftware.events.listeners;
 
 import com.internship.deltasmartsoftware.events.model.RegistrationCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
-import com.internship.deltasmartsoftware.service.UserService;
+import com.internship.deltasmartsoftware.service.AuthUserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,13 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
-    private UserService userService;
+    private AuthUserService userService;
 
     private final String frontUrl = "https://company-organization-software.vercel.app/";
 
     private JavaMailSender mailSender;
 
-    public RegistrationCompleteEventListener(UserService userService, JavaMailSender mailSender) {
+    public RegistrationCompleteEventListener(AuthUserService userService, JavaMailSender mailSender) {
         this.userService = userService;
         this.mailSender = mailSender;
     }

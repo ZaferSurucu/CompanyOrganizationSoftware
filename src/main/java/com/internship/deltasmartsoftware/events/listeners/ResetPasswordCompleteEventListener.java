@@ -2,7 +2,7 @@ package com.internship.deltasmartsoftware.events.listeners;
 
 import com.internship.deltasmartsoftware.events.model.ResetPasswordCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
-import com.internship.deltasmartsoftware.service.UserService;
+import com.internship.deltasmartsoftware.service.AuthUserService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 public class ResetPasswordCompleteEventListener implements ApplicationListener<ResetPasswordCompleteEvent> {
 
-    private UserService service;
+    private AuthUserService service;
 
     private final String frontUrl = "https://company-organization-software.vercel.app";
 
@@ -24,7 +24,7 @@ public class ResetPasswordCompleteEventListener implements ApplicationListener<R
 
     private User theUser;
 
-    public ResetPasswordCompleteEventListener(UserService service, JavaMailSender mailSender) {
+    public ResetPasswordCompleteEventListener(AuthUserService service, JavaMailSender mailSender) {
         this.service = service;
         this.mailSender = mailSender;
     }

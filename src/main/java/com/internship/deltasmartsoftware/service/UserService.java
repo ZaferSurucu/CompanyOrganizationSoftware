@@ -2,51 +2,51 @@ package com.internship.deltasmartsoftware.service;
 
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.UserRepository;
-import com.internship.deltasmartsoftware.model.VerificationToken;
-import com.internship.deltasmartsoftware.repository.VerificationTokenRepository;
+import com.internship.deltasmartsoftware.responses.UsersAndLengthResponse;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
+import org.slf4j.Logger;
 
 @Service
 public class UserService {
 
-    private VerificationTokenRepository verificationTokenRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
 
-
-    UserRepository userRepository;
-
-    public UserService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
-        this.verificationTokenRepository = tokenRepository;
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User getOneUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+    // get users by pagination and sorting
+    public ResponseEntity<UsersAndLengthResponse> getAllUsers(String keyword, int pageNumber, int pageSize, String[] sortingParams) {
+        UsersAndLengthResponse usersAndLengthResponse = new UsersAndLengthResponse();
+        String field = sortingParams[0];
+        String order = sortingParams[1];
+        // log field and order
+        LOGGER.info("field: " + field + ", order: " + order);
 
-    public void saveOneUser(User user) {
-        userRepository.save(user);
-    }
+        Sort.Direction direction = order.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(direction, field));
+        Page<User> userPage;
 
-    public void saveUserVerificationToken(User theUser, String token) {
-        VerificationToken verificationToken = new VerificationToken(token, theUser);
-        verificationTokenRepository.save(verificationToken);
-    }
-
-    public String validateToken(String theToken) {
-        VerificationToken token = verificationTokenRepository.findByToken(theToken);
-        if(token == null){
-            return "Invalid verification token";
+        if(keyword == null) {
+            userPage = userRepository.findAll(pageRequest);
         }
-        User user = token.getUser();
-        Calendar calendar = Calendar.getInstance();
-        if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
-            verificationTokenRepository.delete(token);
-            return "Token already expired";
+        else {
+            userPage = userRepository.findByNameContainingIgnoreCase(keyword, pageRequest);
         }
-        user.setEnabled(true);
-        userRepository.save(user);
-        return "valid";
+        usersAndLengthResponse.setUsers(userPage.getContent());
+        usersAndLengthResponse.setLength(userPage.getTotalElements());
+
+        return ResponseEntity.ok(usersAndLengthResponse);
+    }
+
+    public User getUserById(int id) {
+        return userRepository.findById(id);
     }
 }

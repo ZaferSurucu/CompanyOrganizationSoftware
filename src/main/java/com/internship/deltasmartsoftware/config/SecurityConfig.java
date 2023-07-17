@@ -1,9 +1,9 @@
 package com.internship.deltasmartsoftware.config;
 
 
+import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.security.JwtAuthenticationFilter;
 import com.internship.deltasmartsoftware.security.RestAuthenticationEntryPoint;
-import com.internship.deltasmartsoftware.service.authService.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,11 +27,11 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final UserRepository repository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
-        this.customUserDetailsService = customUserDetailsService;
+    public SecurityConfig(UserRepository repository, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
+        this.repository = repository;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
@@ -43,11 +46,17 @@ public class SecurityConfig {
     }
 
     @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-        authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(userDetailsService());
 
         return authProvider;
     }
@@ -77,9 +86,11 @@ public class SecurityConfig {
                 .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests()
-                .requestMatchers("/**").permitAll()
-                .anyRequest().authenticated();
+                        .authorizeHttpRequests()
+                                .requestMatchers("/auth/**","/swagger-ui/**").permitAll()
+                        .requestMatchers("/users/**").hasAnyAuthority("Admin","Manager")
+                .anyRequest()
+                .authenticated();
 
         httpSecurity.authenticationProvider(authenticationProvider());
         httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
