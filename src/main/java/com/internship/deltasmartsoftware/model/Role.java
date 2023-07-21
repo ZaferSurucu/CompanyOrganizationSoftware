@@ -1,31 +1,27 @@
 package com.internship.deltasmartsoftware.model;
 
+import com.internship.deltasmartsoftware.model.Base.BaseModel;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 
 @Entity
 @Table(name="role")
 @Data
-public class Role {
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Role extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
-
-    private String createdAt;
-
-    public Role(String name){
-        this.name = name;
-        this.createdAt = new Date().toString();
-    }
-
-    public Role(){
-        this.id = 0;
-        this.name = "name";
-        this.createdAt = new Date().toString();
-    }
 }

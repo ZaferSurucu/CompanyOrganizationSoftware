@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 public class RegisterResponse {
-    List<Company> companies;
-    List<Role> roles;
+    Iterable<Company> companies;
+    Iterable<Role> roles;
 }

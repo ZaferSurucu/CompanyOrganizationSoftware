@@ -3,15 +3,11 @@ package com.internship.deltasmartsoftware.service.usersService;
 import com.internship.deltasmartsoftware.model.*;
 import com.internship.deltasmartsoftware.repository.*;
 import com.internship.deltasmartsoftware.requests.UserCreateRequest;
-import com.internship.deltasmartsoftware.responses.AuthResponse;
 import com.internship.deltasmartsoftware.responses.RegisterResponse;
-import com.internship.deltasmartsoftware.service.AuthUserService;
-import org.passay.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,45 +17,43 @@ public class CreateUserService {
     private CompanyRepository companyRepository;
     private DepartmentRepository departmentRepository;
     private RoleRepository roleRepository;
-    private AuthUserService userService;
+    private UserRepository userRepository;
 
-    public CreateUserService(CompanyRepository companyRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository, AuthUserService userService) {
+    public CreateUserService(CompanyRepository companyRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository, UserRepository userRepository) {
         this.companyRepository = companyRepository;
         this.departmentRepository = departmentRepository;
         this.roleRepository = roleRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
-    public ResponseEntity<List<Department>> getDepartments(int companyId){
-        List<Department> departments = departmentRepository.findAllByCompanyId(companyId);
+    public ResponseEntity<Iterable<Department>> getDepartments(int companyId){
+        Iterable<Department> departments = departmentRepository.findAllByCompanyId(companyId);
         return ResponseEntity.ok(departments);
     }
 
     public ResponseEntity<RegisterResponse> getRolesAndCompanies(){
         RegisterResponse registerResponse = new RegisterResponse();
-        List<Role> roles = roleRepository.findAll();
-        registerResponse.setRoles(roles);
-        registerResponse.setCompanies(companyRepository.findAll());
+        registerResponse.setRoles(roleRepository.findAllActive());
+        registerResponse.setCompanies(companyRepository.findAllActive());
         return ResponseEntity.ok(registerResponse);
     }
 
-    public ResponseEntity<AuthResponse> create(UserCreateRequest request) {
+    public ResponseEntity<User> create(UserCreateRequest request) {
 
-        AuthResponse authResponse = new AuthResponse();
-        if(userService.getOneUserByEmail(request.getEmail()) != null) {
-            authResponse.setMessage("User already exists");
-            return ResponseEntity.badRequest().body(authResponse);
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().build();
         }
 
         User user = new User();
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
-        user.setDepartment(departmentRepository.findById(request.getDepartmentId()));
-        user.setRole(roleRepository.findById(request.getRoleId()));
-        userService.saveOneUser(user);
-        authResponse.setUserId(user.getId());
-        return ResponseEntity.ok(authResponse);
+        user.setDepartment(departmentRepository.findOneActive(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found")));
+        user.setRole(roleRepository.findOneActive(request.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found")));
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
     }
 
 

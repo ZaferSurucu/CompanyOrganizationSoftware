@@ -18,8 +18,12 @@ public class DeleteService {
 
     // function for soft delete
 
-    public void deleteUser(int userId){
-        User user = userRepository.findById(userId);
-        userRepository.deleteById(user.getId());
+    public ResponseEntity<User> deleteUser(int userId){
+        User user = userRepository.findOneActive(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepository.delete(user.getId());
+        return ResponseEntity.ok(user);
     }
 }

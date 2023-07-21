@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -35,7 +37,7 @@ public class UserService {
         Page<User> userPage;
 
         if(keyword == null) {
-            userPage = userRepository.findAll(pageRequest);
+            userPage = userRepository.findAllActive(pageRequest);
         }
         else {
             userPage = userRepository.findByNameContainingIgnoreCase(keyword, pageRequest);
@@ -46,7 +48,7 @@ public class UserService {
         return ResponseEntity.ok(usersAndLengthResponse);
     }
 
-    public User getUserById(int id) {
-        return userRepository.findById(id);
+    public Optional<User> getUser(int id){
+        return userRepository.findOneActive(id);
     }
 }

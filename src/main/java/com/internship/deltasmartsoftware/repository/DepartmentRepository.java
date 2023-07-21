@@ -1,11 +1,13 @@
 package com.internship.deltasmartsoftware.repository;
 
 import com.internship.deltasmartsoftware.model.Department;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.internship.deltasmartsoftware.repository.SoftDelete.SoftDeleteRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface DepartmentRepository extends JpaRepository<Department, Integer> {
-    public List<Department> findAllByCompanyId(int companyId);
-    public Department findById(int id);
+@Repository
+public interface DepartmentRepository extends SoftDeleteRepository<Department, Integer> {
+    Iterable<Department> findAllByCompanyId(int companyId);
 }

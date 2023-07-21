@@ -1,7 +1,12 @@
 package com.internship.deltasmartsoftware.model;
 
+import com.internship.deltasmartsoftware.model.Base.BaseModelWithDeletedAt;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +19,11 @@ import java.util.List;
 @Entity
 @Data
 @Table(name="user")
-public class User implements UserDetails {
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class User extends BaseModelWithDeletedAt implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,31 +47,8 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
-    private boolean active;
-
-    private String createdAt;
-
-    private String deletedAt;
-
-    public User(){
-        this.id = 0;
-        this.name = "name";
-        this.surname = null;
-        this.email = "email";
-        this.password = "password";
-        this.enabled = false;
-        this.active = true;
-        this.createdAt = getCurrentTime();
-    }
-
     public boolean getEnabled() {
         return this.enabled;
-    }
-
-    private String getCurrentTime() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        return dtf.format(now);
     }
 
     @Override

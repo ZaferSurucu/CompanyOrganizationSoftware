@@ -1,7 +1,10 @@
 package com.internship.deltasmartsoftware.repository;
 
 import com.internship.deltasmartsoftware.model.DepartmentType;
+import com.internship.deltasmartsoftware.repository.SoftDelete.SoftDeleteRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DepartmentTypeRepository extends JpaRepository<DepartmentType, Integer> {
+@Repository
+public interface DepartmentTypeRepository extends SoftDeleteRepository<DepartmentType, Integer> {
 }

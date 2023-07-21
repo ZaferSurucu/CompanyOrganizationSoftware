@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -33,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") int id){
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<Optional<User>> getUser(@PathVariable("id") int id){
+        return ResponseEntity.ok(userService.getUser(id));
     }
 
     @GetMapping("/all")
@@ -53,12 +54,12 @@ public class UserController {
     }
 
     @GetMapping("/departments/{companyId}")
-    public ResponseEntity<List<Department>> getDepartments(@PathVariable(value = "companyId") int companyId){
+    public ResponseEntity<Iterable<Department>> getDepartments(@PathVariable(value = "companyId") int companyId){
         return createUserService.getDepartments(companyId);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<AuthResponse> createUser(@RequestBody UserCreateRequest userRequest){
+    public ResponseEntity<User> createUser(@RequestBody UserCreateRequest userRequest){
         return createUserService.create(userRequest);
     }
 /*
@@ -68,12 +69,12 @@ public class UserController {
     }
 */
     @PutMapping("/{id}")
-    public ResponseEntity<AuthResponse> updateUser(UserCreateRequest request, @PathVariable("id") int id){
+    public ResponseEntity<User> updateUser(UserCreateRequest request, @PathVariable("id") int id){
         return updateService.updateUser(request, id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") int userId){
-        deleteService.deleteUser(userId);
+    public ResponseEntity<User> deleteUser(@PathVariable("id") int userId){
+        return deleteService.deleteUser(userId);
     }
 }

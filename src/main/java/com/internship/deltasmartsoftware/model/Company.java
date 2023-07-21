@@ -1,12 +1,21 @@
 package com.internship.deltasmartsoftware.model;
 
+import com.internship.deltasmartsoftware.model.Base.BaseModelWithDeletedAt;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name="company")
 @Data
-public class Company {
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Company extends BaseModelWithDeletedAt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,10 +34,4 @@ public class Company {
     private Town town;
 
     private String addressDetail;
-
-    private boolean active;
-
-    private String createdAt;
-
-    private String deletedAt;
 }

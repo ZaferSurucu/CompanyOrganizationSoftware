@@ -7,29 +7,17 @@ import com.internship.deltasmartsoftware.repository.VerificationTokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.List;
 
 @Service
-public class AuthUserService {
+public class VerificationTokenService {
 
     private VerificationTokenRepository verificationTokenRepository;
+    private UserRepository userRepository;
 
-
-    UserRepository userRepository;
-
-    public AuthUserService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
+    public VerificationTokenService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
         this.verificationTokenRepository = tokenRepository;
         this.userRepository = userRepository;
     }
-
-    public User getOneUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    public void saveOneUser(User user) {
-        userRepository.save(user);
-    }
-
 
     public void saveUserVerificationToken(User theUser, String token) {
         VerificationToken verificationToken = new VerificationToken(token, theUser);
@@ -50,5 +38,9 @@ public class AuthUserService {
         user.setEnabled(true);
         userRepository.save(user);
         return "valid";
+    }
+
+    public VerificationToken findByToken(String token){
+        return verificationTokenRepository.findByToken(token);
     }
 }

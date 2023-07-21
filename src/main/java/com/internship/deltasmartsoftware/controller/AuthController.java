@@ -16,7 +16,7 @@ public class AuthController {
     //'Password' by default is null and 'Enabled' by default is 0.
     //An email with a link(15 minute expiration duration
 
-    private AuthService authService;
+    private final AuthService authService;
 
     public AuthController(AuthService authService) {
         this.authService = authService;

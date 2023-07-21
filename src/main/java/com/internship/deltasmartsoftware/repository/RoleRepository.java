@@ -1,10 +1,12 @@
 package com.internship.deltasmartsoftware.repository;
 
 import com.internship.deltasmartsoftware.model.Role;
+import com.internship.deltasmartsoftware.repository.SoftDelete.SoftDeleteRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface RoleRepository extends JpaRepository<Role, Integer> {
-    Role findByName(String role);
-    //List<Role> findAll();
-    Role findById(int id);
+import java.util.Optional;
+
+@Repository
+public interface RoleRepository extends SoftDeleteRepository<Role, Integer> {
 }

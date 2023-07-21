@@ -5,8 +5,6 @@ import com.internship.deltasmartsoftware.repository.DepartmentRepository;
 import com.internship.deltasmartsoftware.repository.RoleRepository;
 import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.requests.UserCreateRequest;
-import com.internship.deltasmartsoftware.responses.AuthResponse;
-import com.internship.deltasmartsoftware.service.AuthUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,26 +14,27 @@ public class UpdateService {
     private UserRepository userRepository;
     private DepartmentRepository departmentRepository;
     private RoleRepository roleRepository;
-    private AuthUserService userService;
 
-    public UpdateService(UserRepository userRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository, AuthUserService userService) {
+    public UpdateService(UserRepository userRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.roleRepository = roleRepository;
-        this.userService = userService;
     }
 
-    public ResponseEntity<AuthResponse> updateUser(UserCreateRequest request, int id){
-        AuthResponse authResponse = new AuthResponse();
+    public ResponseEntity<User> updateUser(UserCreateRequest request, int id){
 
-        User user = userRepository.findById(id);
+        User user = userRepository.findOneActive(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
-        user.setDepartment(departmentRepository.findById(request.getDepartmentId()));
-        user.setRole(roleRepository.findById(request.getRoleId()));
-        userService.saveOneUser(user);
-        authResponse.setUserId(user.getId());
-        return ResponseEntity.ok(authResponse);
+        user.setDepartment(departmentRepository.findOneActive(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found")));
+        user.setRole(roleRepository.findOneActive(request.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found")));
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
     }
 }
