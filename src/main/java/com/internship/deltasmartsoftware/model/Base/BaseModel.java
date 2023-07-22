@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @SuperBuilder
@@ -19,10 +20,12 @@ public abstract class BaseModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        this.createdAt = now.format(formatter);
     }
 }

@@ -1,5 +1,6 @@
 package com.internship.deltasmartsoftware.service;
 
+import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.events.model.RegistrationCompleteEvent;
 import com.internship.deltasmartsoftware.events.model.ResetPasswordCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
@@ -11,6 +12,7 @@ import com.internship.deltasmartsoftware.security.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import org.passay.*;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,14 +33,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenService tokenService;
+    private final MessageSource messageSource;
 
-    public AuthService(AuthenticationManager authenticationManager, TokenProvider tokenProvider, ApplicationEventPublisher publisher, UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenService tokenService) {
+    public AuthService(AuthenticationManager authenticationManager, TokenProvider tokenProvider, ApplicationEventPublisher publisher, UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenService tokenService, MessageSource messageSource) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.publisher = publisher;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.messageSource = messageSource;
     }
 
     public ResponseEntity<AuthResponse> login(LoginRequest loginRequest) {
@@ -46,7 +50,7 @@ public class AuthService {
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
         String jwtToken = tokenProvider.generateToken(auth);
-        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         AuthResponse authResponse = new AuthResponse();
         authResponse.setAccessToken("Bearer " + jwtToken);
         authResponse.setUserId(user.getId());
@@ -55,33 +59,40 @@ public class AuthService {
 
     public ResponseEntity<AuthResponse> forgotPassword(LoginRequest loginRequest, HttpServletRequest request) {
         AuthResponse authResponse = new AuthResponse();
+        String message;
         if(userRepository.findByEmail(loginRequest.getEmail()).isPresent()) {
-            User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
             publisher.publishEvent(new ResetPasswordCompleteEvent(user, applicationUrl(request)));
-            authResponse.setMessage("Password reset email sent");
+            message = messageSource.getMessage("auth.resetPasswordMailSend", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.ok(authResponse);
         }
         else {
-            authResponse.setMessage("User does not exist");
+            message = messageSource.getMessage("auth.userNotFound", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.badRequest().body(authResponse);
         }
     }
 
     public ResponseEntity<AuthResponse> activateAccount(LoginRequest loginRequest, HttpServletRequest request) {
         AuthResponse authResponse = new AuthResponse();
-        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        String message;
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if(user != null) {
             if(user.getEnabled()) {
-                authResponse.setMessage("User already activated");
+                message = messageSource.getMessage("auth.userAlreadyActivated", null, request.getLocale());
+                authResponse.setMessage(message);
                 return ResponseEntity.badRequest().body(authResponse);
             } else {
                 publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
-                authResponse.setMessage("Activation email sent");
+                message = messageSource.getMessage("auth.activationMailSend", null, request.getLocale());
+                authResponse.setMessage(message);
                 return ResponseEntity.ok(authResponse);
             }
         }
         else {
-            authResponse.setMessage("User does not exist");
+            message = messageSource.getMessage("auth.userNotFound", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.badRequest().body(authResponse);
         }
     }
@@ -90,11 +101,13 @@ public class AuthService {
         return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
     }
 
-    public ResponseEntity<AuthResponse> setNewPassword(LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> setNewPassword(LoginRequest loginRequest, HttpServletRequest request) {
         AuthResponse authResponse = new AuthResponse();
-        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        String message;
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if(!validatePassword(loginRequest.getPassword())){
-            authResponse.setMessage("bad password");
+            message = messageSource.getMessage("auth.passwordNotValid", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.badRequest().body(authResponse);
         }
 
@@ -107,12 +120,14 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(auth);
             String jwtToken = tokenProvider.generateToken(auth);
 
-            authResponse.setMessage("Password reset");
+            message = messageSource.getMessage("auth.passwordReset", null, request.getLocale());
+            authResponse.setMessage(message);
             authResponse.setAccessToken("Bearer " + jwtToken);
             return ResponseEntity.ok(authResponse);
         }
         else {
-            authResponse.setMessage("User does not exist");
+            message = messageSource.getMessage("auth.userNotFound", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.badRequest().body(authResponse);
         }
     }
@@ -131,24 +146,29 @@ public class AuthService {
         return result.isValid();
     }
 
-    public ResponseEntity<AuthResponse> verifyResetPasswordEmailToken(String token){
+    public ResponseEntity<AuthResponse> verifyResetPasswordEmailToken(String token, HttpServletRequest request){
         AuthResponse authResponse = new AuthResponse();
+        String message;
         VerificationToken theToken = tokenService.findByToken(token);
         String verificationResult = tokenService.validateToken(token);
         if (verificationResult.equalsIgnoreCase("valid")){
-            authResponse.setMessage("Verification successful, please, reset your password.");
+            message = messageSource.getMessage("auth.resetPasswordTokenValid", null, request.getLocale());
+            authResponse.setMessage(message);
             authResponse.setEmail(theToken.getUser().getEmail());
             return ResponseEntity.ok(authResponse);
         }
-        authResponse.setMessage("Invalid verification token");
+        message = messageSource.getMessage("auth.resetPasswordTokenInvalid", null, request.getLocale());
+        authResponse.setMessage(message);
         return ResponseEntity.badRequest().body(authResponse);
     }
 
-    public ResponseEntity<AuthResponse> verifyActivationEmailToken(String token){
+    public ResponseEntity<AuthResponse> verifyActivationEmailToken(String token, HttpServletRequest request){
         AuthResponse authResponse = new AuthResponse();
+        String message;
         VerificationToken theToken = tokenService.findByToken(token);
         if (theToken.getUser().getEnabled()){
-            authResponse.setMessage("This account has already been verified, please, login.");
+            message = messageSource.getMessage("auth.userAlreadyActivated", null, request.getLocale());
+            authResponse.setMessage(message);
             return ResponseEntity.badRequest().body(authResponse);
         }
         String verificationResult = tokenService.validateToken(token);
@@ -156,11 +176,13 @@ public class AuthService {
             User user = theToken.getUser();
             user.setEnabled(true);
             userRepository.save(user);
-            authResponse.setMessage("Verification successful, please, login.");
+            message = messageSource.getMessage("auth.accountActivated", null, request.getLocale());
+            authResponse.setMessage(message);
             authResponse.setEmail(user.getEmail());
             return ResponseEntity.ok(authResponse);
         }
-        authResponse.setMessage("Invalid verification token");
+        message = messageSource.getMessage("auth.activationTokenInvalid", null, request.getLocale());
+        authResponse.setMessage(message);
         return ResponseEntity.badRequest().body(authResponse);
     }
 }

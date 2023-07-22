@@ -41,9 +41,9 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<UsersAndLengthResponse> getAllUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "pageNumber", defaultValue = "0", required = true) int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "10", required = true) int pageSize,
-            @RequestParam(value = "sort", defaultValue = "id, asc", required = true) String[] sortingParams
+            @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "sort", defaultValue = "id, asc") String[] sortingParams
     ) {
         return userService.getAllUsers(keyword, pageNumber, pageSize, sortingParams);
     }

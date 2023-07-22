@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public abstract class BaseModelWithDeletedAt extends BaseModel {
 
-    private LocalDateTime deletedAt;
+    private String deletedAt;
 
 
 }

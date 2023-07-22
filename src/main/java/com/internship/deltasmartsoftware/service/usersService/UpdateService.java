@@ -1,5 +1,6 @@
 package com.internship.deltasmartsoftware.service.usersService;
 
+import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.DepartmentRepository;
 import com.internship.deltasmartsoftware.repository.RoleRepository;
@@ -23,7 +24,7 @@ public class UpdateService {
 
     public ResponseEntity<User> updateUser(UserCreateRequest request, int id){
 
-        User user = userRepository.findOneActive(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -31,9 +32,9 @@ public class UpdateService {
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
         user.setDepartment(departmentRepository.findOneActive(request.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("Department not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found")));
         user.setRole(roleRepository.findOneActive(request.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found")));
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }

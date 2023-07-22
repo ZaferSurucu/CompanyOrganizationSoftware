@@ -1,5 +1,6 @@
 package com.internship.deltasmartsoftware.service.usersService;
 
+import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.responses.AuthResponse;
@@ -19,7 +20,7 @@ public class DeleteService {
     // function for soft delete
 
     public ResponseEntity<User> deleteUser(int userId){
-        User user = userRepository.findOneActive(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findOneActive(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (user == null) {
             return ResponseEntity.notFound().build();
         }

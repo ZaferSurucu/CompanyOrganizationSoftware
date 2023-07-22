@@ -14,7 +14,9 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -74,6 +76,7 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
     @Override
     public Optional<T> findOneActive(ID id) {
         if (isFieldDeletedAtExists()){
+
             return super.findOne(Specification.where(new ByIdSpecification<>(entityInformation, id)).and(notDeleted()));
         } else {
             return super.findOne(Specification.where(new ByIdSpecification<>(entityInformation, id)));
@@ -96,6 +99,16 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
         } else {
             return super.findAll(spec);
         }
+    }
+
+    private String localeDateTimeToString(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        return localDateTime.format(formatter);
+    }
+
+    private LocalDateTime stringToLocalDateTime(String string) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        return LocalDateTime.parse(string, formatter);
     }
 
     @Override
@@ -144,7 +157,7 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
 
         Root<T> root = update.from(domainClass);
 
-        update.set(DELETED_FIELD, localDateTime);
+        update.set(DELETED_FIELD, localeDateTimeToString(localDateTime));
 
         update.where(
                 cb.equal(
@@ -169,14 +182,15 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
     private static final class DeletedIsNull<T> implements Specification<T> {
         @Override
         public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-            return cb.isNull(root.<LocalDateTime>get(DELETED_FIELD));
+            return cb.isNull(root.get(DELETED_FIELD));
         }
     }
 
     private static final class DeletedTimeGreaterThanNow<T> implements Specification<T> {
         @Override
         public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-            return cb.greaterThan(root.<LocalDateTime>get(DELETED_FIELD), LocalDateTime.now());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            return cb.greaterThan(root.get(DELETED_FIELD), LocalDateTime.now().format(formatter));
         }
     }
 

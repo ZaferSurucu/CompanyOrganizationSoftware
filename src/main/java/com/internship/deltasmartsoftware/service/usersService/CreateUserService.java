@@ -1,5 +1,6 @@
 package com.internship.deltasmartsoftware.service.usersService;
 
+import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.*;
 import com.internship.deltasmartsoftware.repository.*;
 import com.internship.deltasmartsoftware.requests.UserCreateRequest;
@@ -49,9 +50,9 @@ public class CreateUserService {
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
         user.setDepartment(departmentRepository.findOneActive(request.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("Department not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found")));
         user.setRole(roleRepository.findOneActive(request.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found")));
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }

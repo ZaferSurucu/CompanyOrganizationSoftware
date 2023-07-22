@@ -87,6 +87,25 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                         .authorizeHttpRequests()
+                                .requestMatchers("**").permitAll()
+                .anyRequest()
+                .authenticated();
+
+        httpSecurity.authenticationProvider(authenticationProvider());
+        httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+    }
+
+    /*
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .cors()
+                .and()
+                .csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                        .authorizeHttpRequests()
                                 .requestMatchers("/auth/**","/swagger-ui/**").permitAll()
                         .requestMatchers("/users/**").hasAnyAuthority("Admin","Manager")
                 .anyRequest()
@@ -96,5 +115,6 @@ public class SecurityConfig {
         httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
+     */
 
 }

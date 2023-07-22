@@ -43,18 +43,18 @@ public class AuthController {
     }
 
     @PostMapping("/setNewPassword")
-    public ResponseEntity<AuthResponse> resetPassword(@RequestBody LoginRequest loginRequest) {
-        return authService.setNewPassword(loginRequest);
+    public ResponseEntity<AuthResponse> resetPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        return authService.setNewPassword(loginRequest,request);
     }
 
     @PostMapping("/verifyResetPasswordToken")
-    public ResponseEntity<AuthResponse> verifyResetPasswordToken(@RequestParam("token") String token) {
-        return authService.verifyResetPasswordEmailToken(token);
+    public ResponseEntity<AuthResponse> verifyResetPasswordToken(@RequestParam("token") String token, HttpServletRequest request) {
+        return authService.verifyResetPasswordEmailToken(token,request);
     }
 
 
     @PostMapping("/verifyActivationEmailToken")
-    public ResponseEntity<AuthResponse> verifyEmail(@RequestParam("token") String token) {
-        return authService.verifyActivationEmailToken(token);
+    public ResponseEntity<AuthResponse> verifyEmail(@RequestParam("token") String token, HttpServletRequest request) {
+        return authService.verifyActivationEmailToken(token,request);
     }
 }
