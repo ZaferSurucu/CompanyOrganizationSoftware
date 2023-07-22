@@ -1,6 +1,6 @@
 package com.internship.deltasmartsoftware.controller;
 
-import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.requests.ApiErrorRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

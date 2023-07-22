@@ -1,6 +1,6 @@
 package com.internship.deltasmartsoftware.service;
 
-import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.events.model.RegistrationCompleteEvent;
 import com.internship.deltasmartsoftware.events.model.ResetPasswordCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;

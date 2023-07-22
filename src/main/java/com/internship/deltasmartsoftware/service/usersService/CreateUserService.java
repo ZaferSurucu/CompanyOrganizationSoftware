@@ -1,6 +1,6 @@
 package com.internship.deltasmartsoftware.service.usersService;
 
-import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.*;
 import com.internship.deltasmartsoftware.repository.*;
 import com.internship.deltasmartsoftware.requests.UserCreateRequest;
@@ -8,8 +8,6 @@ import com.internship.deltasmartsoftware.responses.RegisterResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
-
-import java.util.List;
 
 @Service
 public class CreateUserService {

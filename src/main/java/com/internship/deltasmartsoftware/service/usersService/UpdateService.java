@@ -1,6 +1,6 @@
 package com.internship.deltasmartsoftware.service.usersService;
 
-import com.internship.deltasmartsoftware.Exceptions.ResourceNotFoundException;
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.DepartmentRepository;
 import com.internship.deltasmartsoftware.repository.RoleRepository;

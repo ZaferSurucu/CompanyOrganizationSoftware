@@ -3,17 +3,15 @@ package com.internship.deltasmartsoftware.controller;
 import com.internship.deltasmartsoftware.model.Department;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.requests.UserCreateRequest;
-import com.internship.deltasmartsoftware.responses.AuthResponse;
 import com.internship.deltasmartsoftware.responses.RegisterResponse;
 import com.internship.deltasmartsoftware.responses.UsersAndLengthResponse;
-import com.internship.deltasmartsoftware.service.UserService;
+import com.internship.deltasmartsoftware.service.UsersService;
 import com.internship.deltasmartsoftware.service.usersService.DeleteService;
 import com.internship.deltasmartsoftware.service.usersService.CreateUserService;
 import com.internship.deltasmartsoftware.service.usersService.UpdateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,20 +20,20 @@ import java.util.Optional;
 public class UserController {
 
     private CreateUserService createUserService;
-    private UserService userService;
+    private UsersService usersService;
     private UpdateService updateService;
     private DeleteService deleteService;
 
-    public UserController(CreateUserService createUserService, UserService userService, UpdateService updateService, DeleteService deleteService) {
+    public UserController(CreateUserService createUserService, UsersService usersService, UpdateService updateService, DeleteService deleteService) {
         this.createUserService = createUserService;
-        this.userService = userService;
+        this.usersService = usersService;
         this.updateService = updateService;
         this.deleteService = deleteService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<User>> getUser(@PathVariable("id") int id){
-        return ResponseEntity.ok(userService.getUser(id));
+        return ResponseEntity.ok(usersService.getUser(id));
     }
 
     @GetMapping("/all")
@@ -45,7 +43,7 @@ public class UserController {
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(value = "sort", defaultValue = "id, asc") String[] sortingParams
     ) {
-        return userService.getAllUsers(keyword, pageNumber, pageSize, sortingParams);
+        return usersService.getAllUsers(keyword, pageNumber, pageSize, sortingParams);
     }
 
     @GetMapping("/create")

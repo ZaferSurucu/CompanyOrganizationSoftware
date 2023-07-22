@@ -15,12 +15,12 @@ import org.slf4j.Logger;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UsersService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsersService.class);
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UsersService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
