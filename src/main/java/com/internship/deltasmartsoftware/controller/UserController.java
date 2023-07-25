@@ -2,17 +2,14 @@ package com.internship.deltasmartsoftware.controller;
 
 import com.internship.deltasmartsoftware.model.Department;
 import com.internship.deltasmartsoftware.model.User;
-import com.internship.deltasmartsoftware.requests.UserCreateRequest;
-import com.internship.deltasmartsoftware.responses.RegisterResponse;
-import com.internship.deltasmartsoftware.responses.UsersAndLengthResponse;
+import com.internship.deltasmartsoftware.payload.requests.UserCreateRequest;
+import com.internship.deltasmartsoftware.payload.responses.Response;
 import com.internship.deltasmartsoftware.service.UsersService;
 import com.internship.deltasmartsoftware.service.usersService.DeleteService;
 import com.internship.deltasmartsoftware.service.usersService.CreateUserService;
 import com.internship.deltasmartsoftware.service.usersService.UpdateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -32,12 +29,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> getUser(@PathVariable("id") int id){
-        return ResponseEntity.ok(usersService.getUser(id));
+    public ResponseEntity<Response<User>> getUser(@PathVariable("id") int id){
+        return usersService.getUser(id);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<UsersAndLengthResponse> getAllUsers(
+    public ResponseEntity<Response<Object>> getAllUsers(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -47,32 +44,27 @@ public class UserController {
     }
 
     @GetMapping("/create")
-    public ResponseEntity<RegisterResponse> getRolesAndCompanies(){
+    public ResponseEntity<Response<Object>> getRolesAndCompanies(){
         return createUserService.getRolesAndCompanies();
     }
 
     @GetMapping("/departments/{companyId}")
-    public ResponseEntity<Iterable<Department>> getDepartments(@PathVariable(value = "companyId") int companyId){
+    public ResponseEntity<Response<Iterable<Department>>> getDepartments(@PathVariable(value = "companyId") int companyId){
         return createUserService.getDepartments(companyId);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody UserCreateRequest userRequest){
+    public ResponseEntity<Response<User>> createUser(@RequestBody UserCreateRequest userRequest){
         return createUserService.create(userRequest);
     }
-/*
-    @GetMapping("/update/{id}")
-    public ResponseEntity<User> getUserProps(@PathVariable("id") int id){
-        return updateService.getUserPropsById(id);
-    }
-*/
+
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(UserCreateRequest request, @PathVariable("id") int id){
+    public ResponseEntity<Response<User>> updateUser(UserCreateRequest request, @PathVariable("id") int id){
         return updateService.updateUser(request, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable("id") int userId){
+    public ResponseEntity<Response<User>> deleteUser(@PathVariable("id") int userId){
         return deleteService.deleteUser(userId);
     }
 }

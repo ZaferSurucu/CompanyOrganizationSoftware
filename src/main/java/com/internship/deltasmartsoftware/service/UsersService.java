@@ -1,8 +1,9 @@
 package com.internship.deltasmartsoftware.service;
 
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.User;
+import com.internship.deltasmartsoftware.payload.responses.Response;
 import com.internship.deltasmartsoftware.repository.UserRepository;
-import com.internship.deltasmartsoftware.responses.UsersAndLengthResponse;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UsersService {
@@ -25,8 +27,8 @@ public class UsersService {
     }
 
     // get users by pagination and sorting
-    public ResponseEntity<UsersAndLengthResponse> getAllUsers(String keyword, int pageNumber, int pageSize, String[] sortingParams) {
-        UsersAndLengthResponse usersAndLengthResponse = new UsersAndLengthResponse();
+    public ResponseEntity<Response<Object>> getAllUsers(String keyword, int pageNumber, int pageSize, String[] sortingParams) {
+        Map<String,Object> data = new HashMap<>();
         String field = sortingParams[0];
         String order = sortingParams[1];
         // log field and order
@@ -42,13 +44,14 @@ public class UsersService {
         else {
             userPage = userRepository.findByNameContainingIgnoreCase(keyword, pageRequest);
         }
-        usersAndLengthResponse.setUsers(userPage.getContent());
-        usersAndLengthResponse.setLength(userPage.getTotalElements());
+        data.put("users", userPage.getContent());
+        data.put("length", userPage.getTotalElements());
 
-        return ResponseEntity.ok(usersAndLengthResponse);
+        return Response.ok("users.usersFound", data);
     }
 
-    public Optional<User> getUser(int id){
-        return userRepository.findOneActive(id);
+    public ResponseEntity<Response<User>> getUser(int id){
+        User user = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("users.userNotFound"));
+        return Response.ok("users.userFound", user);
     }
 }

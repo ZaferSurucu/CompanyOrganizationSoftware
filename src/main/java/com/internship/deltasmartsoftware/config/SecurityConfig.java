@@ -25,7 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
     private final UserRepository repository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
@@ -87,26 +87,7 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                         .authorizeHttpRequests()
-                                .requestMatchers("**").permitAll()
-                .anyRequest()
-                .authenticated();
-
-        httpSecurity.authenticationProvider(authenticationProvider());
-        httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        return httpSecurity.build();
-    }
-
-    /*
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .cors()
-                .and()
-                .csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                        .authorizeHttpRequests()
-                                .requestMatchers("/auth/**","/swagger-ui/**").permitAll()
+                                .requestMatchers("/auth/**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                         .requestMatchers("/users/**").hasAnyAuthority("Admin","Manager")
                 .anyRequest()
                 .authenticated();
@@ -115,6 +96,4 @@ public class SecurityConfig {
         httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
-     */
-
 }

@@ -2,10 +2,11 @@ package com.internship.deltasmartsoftware.service.usersService;
 
 import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.User;
+import com.internship.deltasmartsoftware.payload.responses.Response;
 import com.internship.deltasmartsoftware.repository.DepartmentRepository;
 import com.internship.deltasmartsoftware.repository.RoleRepository;
 import com.internship.deltasmartsoftware.repository.UserRepository;
-import com.internship.deltasmartsoftware.requests.UserCreateRequest;
+import com.internship.deltasmartsoftware.payload.requests.UserCreateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,9 @@ public class UpdateService {
         this.roleRepository = roleRepository;
     }
 
-    public ResponseEntity<User> updateUser(UserCreateRequest request, int id){
+    public ResponseEntity<Response<User>> updateUser(UserCreateRequest request, int id){
 
-        User user = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
+        User user = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("users.userNotFound"));
         user.setName(request.getName());
         user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
@@ -36,6 +34,6 @@ public class UpdateService {
         user.setRole(roleRepository.findOneActive(request.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found")));
         userRepository.save(user);
-        return ResponseEntity.ok(user);
+        return Response.ok("users.userUpdated", user);
     }
 }

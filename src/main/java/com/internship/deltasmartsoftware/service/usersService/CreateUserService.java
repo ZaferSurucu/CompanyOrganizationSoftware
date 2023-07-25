@@ -2,12 +2,15 @@ package com.internship.deltasmartsoftware.service.usersService;
 
 import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
 import com.internship.deltasmartsoftware.model.*;
+import com.internship.deltasmartsoftware.payload.responses.Response;
 import com.internship.deltasmartsoftware.repository.*;
-import com.internship.deltasmartsoftware.requests.UserCreateRequest;
-import com.internship.deltasmartsoftware.responses.RegisterResponse;
+import com.internship.deltasmartsoftware.payload.requests.UserCreateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class CreateUserService {
@@ -25,22 +28,22 @@ public class CreateUserService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<Iterable<Department>> getDepartments(int companyId){
+    public ResponseEntity<Response<Iterable<Department>>> getDepartments(int companyId){
         Iterable<Department> departments = departmentRepository.findAllByCompanyId(companyId);
-        return ResponseEntity.ok(departments);
+        return Response.ok("users.departmentsFound", departments);
     }
 
-    public ResponseEntity<RegisterResponse> getRolesAndCompanies(){
-        RegisterResponse registerResponse = new RegisterResponse();
-        registerResponse.setRoles(roleRepository.findAllActive());
-        registerResponse.setCompanies(companyRepository.findAllActive());
-        return ResponseEntity.ok(registerResponse);
+    public ResponseEntity<Response<Object>> getRolesAndCompanies(){
+        Map<String,Object> data = new HashMap<>();
+        data.put("roles", roleRepository.findAllActive());
+        data.put("companies", companyRepository.findAllActive());
+        return Response.ok("users.rolesAndCompaniesFound", data);
     }
 
-    public ResponseEntity<User> create(UserCreateRequest request) {
+    public ResponseEntity<Response<User>> create(UserCreateRequest request) {
 
         if(userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().build();
+            return Response.badRequest("users.emailAlreadyExists");
         }
 
         User user = new User();
@@ -52,7 +55,7 @@ public class CreateUserService {
         user.setRole(roleRepository.findOneActive(request.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found")));
         userRepository.save(user);
-        return ResponseEntity.ok(user);
+        return Response.ok("users.userCreated", user);
     }
 
 

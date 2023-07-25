@@ -1,7 +1,8 @@
 package com.internship.deltasmartsoftware.controller;
 
-import com.internship.deltasmartsoftware.requests.LoginRequest;
-import com.internship.deltasmartsoftware.responses.AuthResponse;
+import com.internship.deltasmartsoftware.model.User;
+import com.internship.deltasmartsoftware.payload.requests.LoginRequest;
+import com.internship.deltasmartsoftware.payload.responses.Response;
 import com.internship.deltasmartsoftware.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -23,38 +24,38 @@ public class AuthController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<AuthResponse> test() {
-        return ResponseEntity.ok(new AuthResponse());
+    public ResponseEntity<Response<Object>> test() {
+        return Response.ok("auth.test", null);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Response<Object>> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
     @PostMapping("/forgotPassword")
-    public ResponseEntity<AuthResponse> forgotPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<Response<User>> forgotPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         return authService.forgotPassword(loginRequest,request);
     }
 
     @PostMapping("/activateAccount")
-    public ResponseEntity<AuthResponse> activateAccount(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<Response<User>> activateAccount(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         return authService.activateAccount(loginRequest,request);
     }
 
-    @PostMapping("/setNewPassword")
-    public ResponseEntity<AuthResponse> resetPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    @PostMapping("/setNewPassword") //
+    public ResponseEntity<Response<Object>> resetPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         return authService.setNewPassword(loginRequest,request);
     }
 
     @PostMapping("/verifyResetPasswordToken")
-    public ResponseEntity<AuthResponse> verifyResetPasswordToken(@RequestParam("token") String token, HttpServletRequest request) {
+    public ResponseEntity<Response<User>> verifyResetPasswordToken(@RequestParam("token") String token, HttpServletRequest request) {
         return authService.verifyResetPasswordEmailToken(token,request);
     }
 
 
     @PostMapping("/verifyActivationEmailToken")
-    public ResponseEntity<AuthResponse> verifyEmail(@RequestParam("token") String token, HttpServletRequest request) {
+    public ResponseEntity<Response<User>> verifyEmail(@RequestParam("token") String token, HttpServletRequest request) {
         return authService.verifyActivationEmailToken(token,request);
     }
 }

@@ -1,4 +1,4 @@
-package com.internship.deltasmartsoftware.requests;
+package com.internship.deltasmartsoftware.payload.requests;
 
 import lombok.Data;
 

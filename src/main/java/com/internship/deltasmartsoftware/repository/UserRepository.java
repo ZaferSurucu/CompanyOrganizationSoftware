@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends SoftDeleteRepository<User, Integer>{
     Optional<User> findByEmail(String email);
+
     Optional<User> save(User user);
     Page<User> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 }
