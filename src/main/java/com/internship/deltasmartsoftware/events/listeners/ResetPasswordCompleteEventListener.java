@@ -34,7 +34,7 @@ public class ResetPasswordCompleteEventListener implements ApplicationListener<R
         theUser = event.getUser();
         String verificationToken = UUID.randomUUID().toString();
         service.saveUserVerificationToken(theUser, verificationToken);
-        String url = frontUrl+"/resetPassword?token="+verificationToken;
+        String url = frontUrl+"/resetPassword/"+verificationToken;
         try {
             sendResetPasswordEmail(url);
         } catch (Exception e) {

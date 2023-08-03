@@ -1,9 +1,11 @@
 package com.internship.deltasmartsoftware.controller;
 
 import com.internship.deltasmartsoftware.model.User;
+import com.internship.deltasmartsoftware.payload.requests.EmailRequest;
 import com.internship.deltasmartsoftware.payload.requests.LoginRequest;
+import com.internship.deltasmartsoftware.payload.requests.SetNewPasswordRequest;
 import com.internship.deltasmartsoftware.payload.responses.Response;
-import com.internship.deltasmartsoftware.service.AuthService;
+import com.internship.deltasmartsoftware.service.AuthControllerService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,14 +15,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    //The admin sets Tolgahan's role, department, company, name, surname, email.
-    //'Password' by default is null and 'Enabled' by default is 0.
-    //An email with a link(15 minute expiration duration
+    private final AuthControllerService authControllerService;
 
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+    public AuthController(AuthControllerService authControllerService) {
+        this.authControllerService = authControllerService;
     }
 
     @GetMapping("/test")
@@ -29,33 +27,33 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response<Object>> login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public ResponseEntity<Response<Object>> login(@RequestBody LoginRequest loginRequest,@RequestParam(value = "oneSignalId",required = false) String oneSignalId) {
+        return authControllerService.login(loginRequest,oneSignalId);
     }
 
     @PostMapping("/forgotPassword")
-    public ResponseEntity<Response<User>> forgotPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        return authService.forgotPassword(loginRequest,request);
+    public ResponseEntity<Response<Object>> forgotPassword(@RequestBody EmailRequest emailRequest, HttpServletRequest request) {
+        return authControllerService.forgotPassword(emailRequest,request);
     }
 
     @PostMapping("/activateAccount")
-    public ResponseEntity<Response<User>> activateAccount(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        return authService.activateAccount(loginRequest,request);
+    public ResponseEntity<Response<Object>> activateAccount(@RequestBody EmailRequest emailRequest, HttpServletRequest request) {
+        return authControllerService.activateAccount(emailRequest,request);
     }
 
-    @PostMapping("/setNewPassword") //
-    public ResponseEntity<Response<Object>> resetPassword(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        return authService.setNewPassword(loginRequest,request);
+    @PostMapping("/setNewPassword")
+    public ResponseEntity<Response<Object>> resetPassword(@RequestBody SetNewPasswordRequest setNewPasswordRequest) {
+        return authControllerService.setNewPassword(setNewPasswordRequest);
     }
 
     @PostMapping("/verifyResetPasswordToken")
-    public ResponseEntity<Response<User>> verifyResetPasswordToken(@RequestParam("token") String token, HttpServletRequest request) {
-        return authService.verifyResetPasswordEmailToken(token,request);
+    public ResponseEntity<Response<Object>> verifyResetPasswordToken(@RequestParam("token") String token) {
+        return authControllerService.verifyResetPasswordEmailToken(token);
     }
 
 
     @PostMapping("/verifyActivationEmailToken")
-    public ResponseEntity<Response<User>> verifyEmail(@RequestParam("token") String token, HttpServletRequest request) {
-        return authService.verifyActivationEmailToken(token,request);
+    public ResponseEntity<Response<Object>> verifyEmail(@RequestParam("token") String token) {
+        return authControllerService.verifyActivationEmailToken(token);
     }
 }

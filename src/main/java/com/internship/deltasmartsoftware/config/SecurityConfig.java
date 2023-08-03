@@ -4,6 +4,7 @@ package com.internship.deltasmartsoftware.config;
 import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.security.JwtAuthenticationFilter;
 import com.internship.deltasmartsoftware.security.RestAuthenticationEntryPoint;
+import com.internship.deltasmartsoftware.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,11 +28,11 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 public class SecurityConfig{
 
-    private final UserRepository repository;
+    private final UserService userService;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    public SecurityConfig(UserRepository repository, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
-        this.repository = repository;
+    public SecurityConfig(UserService userService, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
+        this.userService = userService;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
@@ -47,8 +48,7 @@ public class SecurityConfig{
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> repository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userService::findByEmail;
     }
 
     @Bean

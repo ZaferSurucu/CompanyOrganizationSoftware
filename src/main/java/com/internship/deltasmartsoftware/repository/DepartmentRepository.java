@@ -9,5 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface DepartmentRepository extends SoftDeleteRepository<Department, Integer> {
-    Iterable<Department> findAllByCompanyId(int companyId);
 }

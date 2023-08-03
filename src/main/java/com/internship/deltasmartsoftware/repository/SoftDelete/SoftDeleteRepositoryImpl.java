@@ -2,9 +2,10 @@ package com.internship.deltasmartsoftware.repository.SoftDelete;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,11 +15,11 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
+
 
 public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
         implements SoftDeleteRepository<T, ID> {
@@ -28,6 +29,8 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
     private final EntityManager em;
     private final Class<T> domainClass;
     private static final String DELETED_FIELD = "deletedAt";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SoftDeleteRepositoryImpl.class);
 
     public SoftDeleteRepositoryImpl(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
@@ -76,7 +79,6 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
     @Override
     public Optional<T> findOneActive(ID id) {
         if (isFieldDeletedAtExists()){
-
             return super.findOne(Specification.where(new ByIdSpecification<>(entityInformation, id)).and(notDeleted()));
         } else {
             return super.findOne(Specification.where(new ByIdSpecification<>(entityInformation, id)));
@@ -106,10 +108,6 @@ public class SoftDeleteRepositoryImpl<T, ID extends Serializable> extends Simple
         return localDateTime.format(formatter);
     }
 
-    private LocalDateTime stringToLocalDateTime(String string) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        return LocalDateTime.parse(string, formatter);
-    }
 
     @Override
     public Optional<T> delete(ID id) {

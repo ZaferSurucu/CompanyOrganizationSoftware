@@ -17,10 +17,6 @@ public class Response<T> {
 
     }
 
-    public static <T> ResponseEntity<Response<T>> ok(String message) {
-        return ResponseEntity.ok(new Response<>(message, null));
-    }
-
     public static <T> ResponseEntity<Response<T>> ok(String message, T data) {
         return ResponseEntity.ok(new Response<>(message, data));
     }

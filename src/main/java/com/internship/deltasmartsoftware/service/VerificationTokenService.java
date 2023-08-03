@@ -1,5 +1,7 @@
 package com.internship.deltasmartsoftware.service;
 
+import com.internship.deltasmartsoftware.exceptions.ResourceNotFoundException;
+import com.internship.deltasmartsoftware.exceptions.TokenExpiredException;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.model.VerificationToken;
@@ -12,11 +14,9 @@ import java.util.Calendar;
 public class VerificationTokenService {
 
     private VerificationTokenRepository verificationTokenRepository;
-    private UserRepository userRepository;
 
-    public VerificationTokenService(VerificationTokenRepository tokenRepository, UserRepository userRepository) {
+    public VerificationTokenService(VerificationTokenRepository tokenRepository) {
         this.verificationTokenRepository = tokenRepository;
-        this.userRepository = userRepository;
     }
 
     public void saveUserVerificationToken(User theUser, String token) {
@@ -24,23 +24,21 @@ public class VerificationTokenService {
         verificationTokenRepository.save(verificationToken);
     }
 
-    public String validateToken(String theToken) {
-        VerificationToken token = verificationTokenRepository.findByToken(theToken);
-        if(token == null){
-            return "Invalid verification token";
+    public VerificationToken validateToken(String theToken) throws ResourceNotFoundException, TokenExpiredException{
+        try{
+            VerificationToken token = findByToken(theToken);
+            Calendar calendar = Calendar.getInstance();
+            if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
+                verificationTokenRepository.delete(token);
+                throw new TokenExpiredException("Token already expired");
+            }
+            return token;
+        } catch (ResourceNotFoundException e){
+            throw new ResourceNotFoundException("Token not found");
         }
-        User user = token.getUser();
-        Calendar calendar = Calendar.getInstance();
-        if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
-            verificationTokenRepository.delete(token);
-            return "Token already expired";
-        }
-        user.setEnabled(true);
-        userRepository.save(user);
-        return "valid";
     }
 
     public VerificationToken findByToken(String token){
-        return verificationTokenRepository.findByToken(token);
+        return verificationTokenRepository.findByToken(token).orElseThrow(() -> new ResourceNotFoundException("Token not found"));
     }
 }

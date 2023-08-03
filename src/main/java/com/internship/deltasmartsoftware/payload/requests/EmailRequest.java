@@ -3,10 +3,6 @@ package com.internship.deltasmartsoftware.payload.requests;
 import lombok.Data;
 
 @Data
-public class UserCreateRequest {
-    String name;
-    String surname;
+public class EmailRequest {
     String email;
-    int roleId;
-    int departmentId;
 }

@@ -32,7 +32,6 @@ public interface SoftDeleteRepository<T, ID extends Serializable> extends Paging
 
     Optional<T> findOneActive(Specification<T> spec);
 
-
     Optional<T> delete(ID id);
 
     void delete(T entity);

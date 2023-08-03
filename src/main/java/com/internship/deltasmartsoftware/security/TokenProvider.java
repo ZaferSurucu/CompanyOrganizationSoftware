@@ -31,7 +31,7 @@ public class TokenProvider {
                 .signWith(SignatureAlgorithm.HS512, APP_SECRET)
                 .compact();
     }
-    String getUserEmailFromTokenProvider(String token){
+    public String getUserEmailFromTokenProvider(String token){
         Claims claims =  Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }

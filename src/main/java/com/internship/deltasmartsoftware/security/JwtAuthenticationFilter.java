@@ -23,8 +23,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    Logger logger = org.slf4j.LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
     @Autowired
     private TokenProvider tokenProvider;
 
@@ -40,13 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = getTokenFromRequest(request);
             if(token == null){
-                logger.info("Token is null");
                 filterChain.doFilter(request, response);
                 return;
             }
-            logger.info("Token: " + token);
             if(tokenProvider.validateToken(token)) {
-                logger.info("Token is valid");
                 String email = tokenProvider.getUserEmailFromTokenProvider(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 if (userDetails != null) {
@@ -57,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }catch (Exception e) {
-            logger.error("Could not set user authentication in security context", e);
+            logger.error("Can NOT set user authentication -> Message: {}", e);
         }
         filterChain.doFilter(request, response);
     }
