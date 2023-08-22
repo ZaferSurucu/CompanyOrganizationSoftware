@@ -87,10 +87,8 @@ public class SecurityConfig{
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                         .authorizeHttpRequests()
-                                .requestMatchers("/auth/**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
-                        .requestMatchers("/users/**").hasAnyAuthority("Admin","Manager")
                 .anyRequest()
-                .authenticated();
+                .permitAll();
 
         httpSecurity.authenticationProvider(authenticationProvider());
         httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
