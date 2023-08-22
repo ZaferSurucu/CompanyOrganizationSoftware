@@ -1,7 +1,5 @@
 package com.internship.deltasmartsoftware.controller;
 
-import com.internship.deltasmartsoftware.model.Department;
-import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.payload.requests.UserCreateRequest;
 import com.internship.deltasmartsoftware.payload.responses.DepartmentDTO;
 import com.internship.deltasmartsoftware.payload.responses.Response;
@@ -41,6 +39,8 @@ public class UsersController {
 
     @GetMapping("/all")
     public ResponseEntity<Response<Page<UserDTO>>> getAllUsers(
+            @RequestParam(value = "companyId", required = false) Integer companyId,
+            @RequestParam(value = "departmentId", required = false) Integer departmentId,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
@@ -48,7 +48,7 @@ public class UsersController {
             @RequestParam(value = "order", defaultValue = "asc") String order,
             @RequestHeader(value = "Authorization", required = false) String token
     ) {
-        return usersControllerService.getAllUsers(keyword, pageNumber, pageSize, field, order, token);
+        return usersControllerService.getAllUsers(keyword, pageNumber, pageSize, field, order, token, companyId, departmentId);
     }
 
     @GetMapping("/roles-and-companies")

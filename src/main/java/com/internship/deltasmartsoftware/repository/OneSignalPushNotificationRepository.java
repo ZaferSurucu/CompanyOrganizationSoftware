@@ -1,7 +1,6 @@
 package com.internship.deltasmartsoftware.repository;
 
 import com.internship.deltasmartsoftware.model.OneSignalPushNotification;
-import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

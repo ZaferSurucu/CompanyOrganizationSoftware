@@ -107,14 +107,19 @@ public class AuthControllerService {
         try{
             VerificationToken theToken = tokenService.validateToken(setNewPasswordRequest.getToken());
             User user = theToken.getUser();
-            user.setPassword(passwordEncoder.encode(setNewPasswordRequest.getPassword()));
-            user.setEnabled(true);
-            userService.save(user);
+            if(validatePassword(setNewPasswordRequest.getPassword())){
+                user.setPassword(passwordEncoder.encode(setNewPasswordRequest.getPassword()));
+                user.setEnabled(true);
+                userService.save(user);
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.getEmail(), setNewPasswordRequest.getPassword());
-            Authentication auth = authenticationManager.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            return Response.ok("auth.passwordReset", null);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.getEmail(), setNewPasswordRequest.getPassword());
+                Authentication auth = authenticationManager.authenticate(authToken);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                return Response.ok("auth.passwordReset", null);
+            } else {
+                return Response.badRequest("auth.passwordNotValid");
+            }
+
         } catch (ResourceNotFoundException e) {
             return Response.badRequest("auth.userNotFound");
         } catch (TokenExpiredException e) {

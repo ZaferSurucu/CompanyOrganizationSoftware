@@ -3,6 +3,7 @@ package com.internship.deltasmartsoftware.events.listeners;
 import com.internship.deltasmartsoftware.events.model.ResetPasswordCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.service.VerificationTokenService;
+import com.internship.deltasmartsoftware.util.Translator;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -44,12 +45,12 @@ public class ResetPasswordCompleteEventListener implements ApplicationListener<R
     }
 
     private void sendResetPasswordEmail(String url) throws Exception {
-        String subject = "Reset Password";
-        String senderName = "Reset Password Portal Service";
+        String subject = Translator.toLocale("email.resetPassword");
+        String senderName = Translator.toLocale("email.rpps");
         String mailContent = "<p> Hi, "+ theUser.getName()+
-                "click the link below to reset your password.</p>"+
-                "<a href=\"" +url+ "\">Reset your password</a>"+
-                "<p> Thank you <br> Reset Password Portal Service";
+                " " + Translator.toLocale("email.clickHereToVerify") + ".</p>"+
+                "<a href=\"" +url+ "\">" + Translator.toLocale("email.resetYourPassword") + "</a>"+
+                "<p>" + Translator.toLocale("email.thanks") + "<br>" + Translator.toLocale("email.rpps");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("company@gmail.com", senderName);

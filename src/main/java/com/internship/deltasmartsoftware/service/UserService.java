@@ -46,6 +46,16 @@ public class UserService {
         return changeToUserDTO(users,pageable);
     }
 
+    public Page<UserDTO> findAllUsersByKeywordAndDepartmentId(String keyword, Pageable pageable, int departmentId) throws ResourceNotFoundException{
+        Specification<User> spec = (root, query, cb)
+                -> cb.and(cb.equal(root.get("department").get("id"), departmentId),
+                cb.or(cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"),
+                cb.like(cb.lower(root.get("surname")), "%" + keyword.toLowerCase() + "%"),
+                cb.like(cb.lower(root.get("email")), "%" + keyword.toLowerCase() + "%")));
+        Page<User> users = userRepository.findAllActive(spec, pageable);
+        return changeToUserDTO(users,pageable);
+    }
+
     public User save(User user) {
         return userRepository.save(user).orElseThrow(() -> new IllegalArgumentException("users.userNotSaved"));
     }
@@ -56,6 +66,13 @@ public class UserService {
 
     public Page<UserDTO> findAllUsers(Pageable pageable) throws ResourceNotFoundException{
         Page<User> users = userRepository.findAllActive(pageable);
+        return changeToUserDTO(users,pageable);
+    }
+
+    public Page<UserDTO> findAllUsersByDepartmentId(Pageable pageable, int departmentId) throws ResourceNotFoundException{
+        Specification<User> spec = (root, query, cb)
+                -> cb.equal(root.get("department").get("id"), departmentId);
+        Page<User> users = userRepository.findAllActive(spec, pageable);
         return changeToUserDTO(users,pageable);
     }
 

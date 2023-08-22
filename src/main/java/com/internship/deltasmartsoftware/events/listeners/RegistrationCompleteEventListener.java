@@ -3,6 +3,7 @@ package com.internship.deltasmartsoftware.events.listeners;
 import com.internship.deltasmartsoftware.events.model.RegistrationCompleteEvent;
 import com.internship.deltasmartsoftware.model.User;
 import com.internship.deltasmartsoftware.service.VerificationTokenService;
+import com.internship.deltasmartsoftware.util.Translator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +45,13 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         log.info("Click the link to verify your registration :  {}", url);
     }
     private void sendVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
-        String subject = "Email Verification";
-        String senderName = "User Registration Portal Service";
-        String mailContent = "<p> Hi, "+ theUser.getName()+ ", </p>"+
-                "<p>Thank you for registering with us,"+
-                "Please, follow the link below to complete your registration.</p>"+
-                "<a href=\"" +url+ "\">Verify your email to activate your account</a>"+
-                "<p> Thank you <br> Users Registration Portal Service";
+        String subject = Translator.toLocale("email.verification");
+        String senderName = Translator.toLocale("email.urps");
+        String mailContent = "<p> "+ Translator.toLocale("email.hi") + ", "+ theUser.getName()+ ", </p>"+
+                "<p>" + Translator.toLocale("email.thankForRegistering")+","+
+                Translator.toLocale("email.followLinkToVerify") +".</p>"+
+                "<a href=\"" +url+ "\">" + Translator.toLocale("email.verifyEmail") + "</a>"+
+                "<p>" + Translator.toLocale("email.thanks") + "<br>" + Translator.toLocale("email.urps");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
         messageHelper.setFrom("company@gmail.com", senderName);

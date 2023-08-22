@@ -26,7 +26,8 @@ public class UsersControllerService {
         this.tokenProvider = tokenProvider;
     }
 
-    public ResponseEntity<Response<Page<UserDTO>>> getAllUsers(String keyword, int pageNumber, int pageSize, String field, String order, String token) {
+    public ResponseEntity<Response<Page<UserDTO>>> getAllUsers(String keyword, int pageNumber, int pageSize, String field, String order, String token
+                                                                , Integer companyId, Integer departmentId) {
         String email = tokenProvider.getUserEmailFromTokenProvider(token.substring(7));
         User user;
         try{
@@ -44,15 +45,32 @@ public class UsersControllerService {
         try{
             if(Objects.equals(keyword, null )) {
                 if (role.equals("Admin"))
-                    userPage = userService.findAllUsers(pageRequest);
+                    if(Objects.equals(companyId, null))
+                        userPage = userService.findAllUsers(pageRequest);
+                    else if (Objects.equals(departmentId, null))
+                        userPage = userService.findAllUsersByCompanyId(pageRequest, companyId);
+                    else
+                        userPage = userService.findAllUsersByDepartmentId(pageRequest, departmentId);
+
                 else
-                    userPage = userService.findAllUsersByCompanyId(pageRequest, user.getDepartment().getCompany().getId());
+                    if (Objects.equals(departmentId, null))
+                        userPage = userService.findAllUsersByCompanyId(pageRequest, user.getDepartment().getCompany().getId());
+                    else
+                        userPage = userService.findAllUsersByDepartmentId(pageRequest, departmentId);
             }
             else {
                 if (role.equals("Admin"))
-                    userPage = userService.findAllUsersByKeyword(keyword, pageRequest);
+                    if(Objects.equals(companyId, null))
+                        userPage = userService.findAllUsersByKeyword(keyword, pageRequest);
+                    else if (Objects.equals(departmentId, null))
+                        userPage = userService.findAllUsersByKeywordAndCompanyId(keyword, pageRequest, companyId);
+                    else
+                        userPage = userService.findAllUsersByKeywordAndDepartmentId(keyword, pageRequest, departmentId);
                 else
-                    userPage = userService.findAllUsersByKeywordAndCompanyId(keyword, pageRequest, user.getDepartment().getCompany().getId());
+                    if (Objects.equals(departmentId, null))
+                        userPage = userService.findAllUsersByKeywordAndCompanyId(keyword, pageRequest, user.getDepartment().getCompany().getId());
+                    else
+                        userPage = userService.findAllUsersByKeywordAndDepartmentId(keyword, pageRequest, departmentId);
             }
         } catch (ResourceNotFoundException e) {
             return Response.notFound(e.getMessage());
