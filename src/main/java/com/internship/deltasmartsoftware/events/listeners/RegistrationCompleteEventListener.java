@@ -21,7 +21,7 @@ import java.util.UUID;
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
     private VerificationTokenService userService;
 
-    private final String frontUrl = "https://company-organization-software.vercel.app/";
+    private final String frontUrl = "https://company-organization-software-three.vercel.app";
 
     private JavaMailSender mailSender;
 

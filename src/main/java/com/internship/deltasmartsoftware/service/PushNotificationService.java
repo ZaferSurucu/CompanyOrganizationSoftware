@@ -8,6 +8,8 @@ import com.internship.deltasmartsoftware.repository.OneSignalPushNotificationRep
 import com.internship.deltasmartsoftware.repository.RoleRepository;
 import com.internship.deltasmartsoftware.repository.UserRepository;
 import com.internship.deltasmartsoftware.util.Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,9 @@ import java.util.List;
 
 @Service
 public class PushNotificationService {
+
+    // import logger
+    private static final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
 
     @Value("${onesignal.api_key}")
     private String oneSignalApiKey;
@@ -53,11 +58,12 @@ public class PushNotificationService {
             con.setRequestMethod("POST");
 
             String ids = getOneSignalIdsFromUserIds(userIds);
-
+            logger.info("ids: " + ids);
             String strJsonBody = "{"
-                    + "\"app_id\": \"" + oneSignalAppId + "\","
-                    + "\"include_player_ids\": [" + ids + "],"
-                    + "\"contents\": {\"en\": \"" + message + "\"}"
+                    +   "\"app_id\": \""+ oneSignalAppId +"\","
+                    +   "\"include_player_ids\": [\""+ ids + "\"],"
+                    +   "\"data\": {\"foo\": \"bar\"},"
+                    +   "\"contents\": {\"en\": \""+ message +"\"}"
                     + "}";
 
             byte[] sendBytes = strJsonBody.getBytes(StandardCharsets.UTF_8);
@@ -80,7 +86,7 @@ public class PushNotificationService {
         for (OneSignalPushNotification oneSignalId : oneSignalIds) {
             oneSignalIdsString.append(oneSignalId.getOneSignalId()).append(",");
         }
-        return oneSignalIdsString.toString();
+        return oneSignalIdsString.substring(0, oneSignalIdsString.length() - 1);
     }
 
     private void sendNotificationToAdmins(String message) {

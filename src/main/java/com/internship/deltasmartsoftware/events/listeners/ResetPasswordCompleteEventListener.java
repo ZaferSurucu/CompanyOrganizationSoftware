@@ -19,7 +19,7 @@ public class ResetPasswordCompleteEventListener implements ApplicationListener<R
 
     private VerificationTokenService service;
 
-    private final String frontUrl = "https://company-organization-software.vercel.app";
+    private final String frontUrl = "https://company-organization-software-three.vercel.app";
 
     private JavaMailSender mailSender;
 
